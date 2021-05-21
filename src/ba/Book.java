@@ -42,7 +42,11 @@ public class Book {
                 // get the price level where this order is located
                 level = levels.get(origOrder.price);
                 // iterate over the price level, find order and remove it
-                // NOTE this is the only place where we do scan - if performance is a concern, this needs to be optimized
+                // NOTE this is the only place where we do scan - if performance is a concern, this needs to be optimized:
+                // we have to use an explicit linked list - maintain Orders with links to neighbours; then from the order map
+                // we jump directly to the oder in the list and rearrange the links to exclude this order; this eliminates
+                // the level scan;
+                // NOTE that we are maintaining orders in the proper sequence since this is a fundamental property of the book
                 for(int i = 0; i < level.size(); i++) {
                     Order order_ = level.get(i);
                     if (order_.id.equals(origOrder.id)) {
