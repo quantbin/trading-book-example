@@ -15,7 +15,6 @@ public class Book {
         // pick a side (assuming only two sides possible)
         // find level; if does not exist - create it
         LinkedList<Order> level;
-        //Entry newEntry = new Entry(order.id, order.size, order.side);
         if (OrderType.ADD == order.type) {
             TreeMap<Double, LinkedList<Order>> levels = OrderSide.BUY == order.side ? bidLevels : askLevels;
             if (!levels.containsKey(order.price)) {
