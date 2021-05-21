@@ -8,10 +8,10 @@ public class Book {
     // but when all levels are created, there won't be performance hit due to re-balancing
     TreeMap<Double, LinkedList<Order>> bidLevels = new TreeMap<>();
     TreeMap<Double, LinkedList<Order>> askLevels = new TreeMap<>();
-    //
+    // store orders in the map as well to have a quick access to be able to reduce the size
     HashMap<String, Order> orderMap = new HashMap<>();
 
-    public void processOrder(Order order) {
+    public void processLimitOrder(Order order) {
         // pick a side (assuming only two sides possible)
         // find level; if does not exist - create it
         LinkedList<Order> level;
@@ -50,16 +50,15 @@ public class Book {
                     }
                 }
             }
-            // if we are here then order was not found; nothing to reduce
         }
     }
 
-    public OrderResponse fillMarketOrder(Order order) {
+    public OrderResponse processMarketOrder(Order order) {
         OrderResponse resp = new OrderResponse();
-        // pick a side (assuming only two sides possible)
+        // pick a side
         TreeMap<Double, LinkedList<Order>> levels = OrderSide.BUY == order.side ? askLevels : bidLevels;
-        NavigableSet<Double> prices = OrderSide.BUY == order.side ? levels.navigableKeySet() : levels.descendingKeySet();
         // start filling the order from the most favourable levels
+        NavigableSet<Double> prices = OrderSide.BUY == order.side ? levels.navigableKeySet() : levels.descendingKeySet();
         long filled = 0;
         double totalPrice = 0.0;
         for(Double levelPrice : prices) {
@@ -69,6 +68,7 @@ public class Book {
                 if (order.size <= filled + order_.size) {
                     // we are done
                     filledOnLevel = order.size - filled;
+                    break;
                 } else {
                     filledOnLevel += order_.size;
                 }

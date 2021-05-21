@@ -31,14 +31,14 @@ public class Main {
             try {
                 Order order = Order.parse(orderStr);
                 //System.out.println(order);
-                book.processOrder(order);
+                book.processLimitOrder(order);
                 //book.print();
 
-                OrderResponse respBuy = book.fillMarketOrder(mktBuyOrder);
+                OrderResponse respBuy = book.processMarketOrder(mktBuyOrder);
                 respBuy.timestamp = order.timestamp;
                 checkOrder(respBuy, respBuyPrev);
 
-                OrderResponse respSell = book.fillMarketOrder(mktSellOrder);
+                OrderResponse respSell = book.processMarketOrder(mktSellOrder);
                 respSell.timestamp = order.timestamp;
                 checkOrder(respSell, respSellPrev);
 
@@ -53,7 +53,7 @@ public class Main {
         }
     }
 
-    // check and print order
+    // check and print order if there is a change from previous order
     static void checkOrder(OrderResponse resp, OrderResponse respPrev) {
         if (null == respPrev) {
             // first order; was it filled?
