@@ -4,7 +4,7 @@ import java.io.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        // validate params
+        // TODO validate params
         int orderSize = Integer.parseInt(args[0]);
         Book book = new Book();
 
@@ -19,9 +19,11 @@ public class Main {
         Order mktBuyOrder = new Order();
         mktBuyOrder.side = OrderSide.BUY;
         mktBuyOrder.size = orderSize;
+
         Order mktSellOrder = new Order();
         mktSellOrder.side = OrderSide.SELL;
         mktSellOrder.size = orderSize;
+
         String orderStr = ordersIn.readLine();
         OrderResponse respBuyPrev = null;
         OrderResponse respSellPrev = null;
@@ -31,22 +33,43 @@ public class Main {
                 //System.out.println(order);
                 book.processOrder(order);
                 //book.print();
+
                 OrderResponse respBuy = book.fillMarketOrder(mktBuyOrder);
                 respBuy.timestamp = order.timestamp;
-                if ((null != respBuyPrev && respBuyPrev.isFilled ^ respBuy.isFilled)  || (null == respBuyPrev || 0.0000000001 < Math.abs(respBuyPrev.total - respBuy.total)))
-                    System.out.println(respBuy);
+                checkOrder(respBuy, respBuyPrev);
+
                 OrderResponse respSell = book.fillMarketOrder(mktSellOrder);
                 respSell.timestamp = order.timestamp;
-                if ((null != respSellPrev && respSellPrev.isFilled ^ respSell.isFilled) || (null == respSellPrev || 0.0000000001 < Math.abs(respSellPrev.total - respSell.total)))
-                    System.out.println(respSell);
+                checkOrder(respSell, respSellPrev);
+
                 respBuyPrev = respBuy;
                 respSellPrev = respSell;
             } catch (Exception e) {
-                // handle error - log, recover etc
                 System.out.println(e.getMessage());
             } finally {
                 // read next order
                 orderStr = ordersIn.readLine();
+            }
+        }
+    }
+
+    // check and print order
+    static void checkOrder(OrderResponse resp, OrderResponse respPrev) {
+        if (null == respPrev) {
+            // first order; was it filled?
+            if (resp.isFilled) {
+                System.out.println(resp);
+            }
+        } else {
+            // this is not the first order; was there a change?
+            if (respPrev.isFilled ^ resp.isFilled) {
+                // only one order is filled: we went from NA to filled or other way around
+                System.out.println(resp);
+            } else if (respPrev.isFilled && resp.isFilled){
+                // both order were filled; did the amount change?
+                if (0.0000000001 < Math.abs(respPrev.total - resp.total)) {
+                    System.out.println(resp);
+                }
             }
         }
     }

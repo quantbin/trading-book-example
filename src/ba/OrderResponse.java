@@ -1,5 +1,6 @@
 package ba;
 
+// when order is filled, this object is returned
 public class OrderResponse {
     long timestamp;
     OrderSide side;
