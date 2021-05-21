@@ -12,20 +12,22 @@ public class Book {
     HashMap<String, Order> orderMap = new HashMap<>();
 
     public void processLimitOrder(Order order) {
-        // pick a side (assuming only two sides possible)
-        // find level; if does not exist - create it
         LinkedList<Order> level;
         if (OrderType.ADD == order.type) {
+            // (A)dd order;
+            // pick a side (assuming only two sides possible)
+            // find level; if does not exist - create it
             TreeMap<Double, LinkedList<Order>> levels = OrderSide.BUY == order.side ? bidLevels : askLevels;
             if (!levels.containsKey(order.price)) {
+                // add new price level
                 level = new LinkedList<>();
                 levels.put(order.price, level);
             } else {
                 level = levels.get(order.price);
             }
+            // add order to price level and to the map
             level.add(order);
             orderMap.put(order.id, order);
-            // added order; we are done
         } else {
             // (R)educe order - find this order and reduce its size or cancel
             Order origOrder = orderMap.get(order.id);
@@ -33,16 +35,18 @@ public class Book {
                 // after reduction the order size is greater than 0
                 origOrder.size -= order.size;
             } else {
+                // after reduction the order size is less than or equal to 0,
                 // order canceled - remove it;
                 // get side of the book where order is located
                 TreeMap<Double, LinkedList<Order>> levels = OrderSide.BUY == origOrder.side ? bidLevels : askLevels;
                 // get the price level where this order is located
                 level = levels.get(origOrder.price);
                 // iterate over the price level, find order and remove it
+                // NOTE this is the only place where we do scan - if performance is a concern, this needs to be optimized
                 for(int i = 0; i < level.size(); i++) {
                     Order order_ = level.get(i);
                     if (order_.id.equals(origOrder.id)) {
-                        // order canceled - remove it
+                        // order found - remove it from the price level and from the map
                         level.remove(i);
                         orderMap.remove(order_.id);
                         return;
