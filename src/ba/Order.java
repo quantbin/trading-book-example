@@ -2,14 +2,15 @@ package ba;
 
 public class Order {
     // avoiding getters and setters for clarity
-    public long timestamp;
-    public OrderType type;
-    public String id;
-    public OrderSide side;
-    public double price;
-    public long size;
-    public Order next;
-    public Order prev;
+    long timestamp;
+    OrderType type;
+    String id;
+    OrderSide side;
+    double price;
+    int priceInt;
+    long size;
+    Order next;
+    Order prev;
 
     @Override
     public String toString() {
@@ -48,6 +49,7 @@ public class Order {
                         throw new Exception("order: unrecognized side");
                 }
                 order.price = Double.parseDouble(tok[4]);
+                order.priceInt = (int)(order.price * 100.0);
                 order.size = Long.parseLong(tok[5]);
                 break;
             case "R":
