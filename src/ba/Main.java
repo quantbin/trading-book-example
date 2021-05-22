@@ -27,6 +27,8 @@ public class Main {
         String orderStr = ordersIn.readLine();
         OrderResponse respBuyPrev = null;
         OrderResponse respSellPrev = null;
+        long start = System.nanoTime();
+        long count = 0;
         while (null != orderStr) {
             try {
                 Order order = Order.parse(orderStr);
@@ -38,11 +40,11 @@ public class Main {
 
                 OrderResponse respBuy = book.processMarketOrder(mktBuyOrder);
                 respBuy.timestamp = order.timestamp;
-                checkOrder(respBuy, respBuyPrev);
+                //checkOrder(respBuy, respBuyPrev);
 
                 OrderResponse respSell = book.processMarketOrder(mktSellOrder);
                 respSell.timestamp = order.timestamp;
-                checkOrder(respSell, respSellPrev);
+                //checkOrder(respSell, respSellPrev);
 
                 respBuyPrev = respBuy;
                 respSellPrev = respSell;
@@ -51,8 +53,12 @@ public class Main {
             } finally {
                 // read next order
                 orderStr = ordersIn.readLine();
+                count++;
             }
         }
+        long end = System.nanoTime();
+        long lat = (end - start)/count;
+        System.out.println("nanos per iteration: " + lat);
     }
 
     // check and print order if there is a change from previous order
