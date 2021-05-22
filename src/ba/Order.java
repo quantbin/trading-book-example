@@ -8,6 +8,8 @@ public class Order {
     public OrderSide side;
     public double price;
     public long size;
+    public Order next;
+    public Order prev;
 
     @Override
     public String toString() {

@@ -31,6 +31,8 @@ public class Main {
             try {
                 Order order = Order.parse(orderStr);
                 //System.out.println(order);
+                if (order.timestamp == 47382589)
+                    System.out.println();
                 book.processLimitOrder(order);
                 //book.print();
 
